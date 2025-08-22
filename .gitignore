@@ -1,0 +1,73 @@
+# Ignore temp files and development artifacts
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore system generated files
+.htaccess
+error_log
+
+# Ignore configuration files with sensitive data
+includes/config.php.bak
+admin/includes/config.php.bak
+
+# Ignore uploaded files directory if it exists
+uploads/
+temp/
+
+# Ignore backup files
+*.bak
+*.backup
+*.old
+
+# Ignore test files
+test.php
+debug.php
+temp.php.bak
+debug-*.php
+test-*.php
+check-session.php
+
+# Ignore cache and session files
+cache/
+sessions/
+
+# Ignore database dumps
+*.sql.gz
+backup_*.sql
+
+# Ignore composer dependencies (if any)
+vendor/
+composer.lock
+
+# Ignore npm dependencies (if any)
+node_modules/
+package-lock.json
+
+# Ignore compressed files
+*.zip
+*.tar.gz
+*.rar
+
+# Ignore documentation backups and old files
+*.md.bak
+*_OLD.*
+*_backup.*
+
+# Ignore environment-specific files
+.env
+.env.local
+.env.production
+
+# Ignore any personal notes or todo files
+TODO.txt
+NOTES.txt
+notes/

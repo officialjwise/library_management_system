@@ -10,7 +10,7 @@ else{
 if(isset($_GET['del']))
 {
 $id=$_GET['del'];
-$sql = "delete from tblauthors  WHERE id=:id";
+$sql = "delete from authors  WHERE id=:id";
 $query = $dbh->prepare($sql);
 $query -> bindParam(':id',$id, PDO::PARAM_STR);
 $query -> execute();
@@ -116,7 +116,7 @@ header('location:manage-publications.php');
                                         </tr>
                                     </thead>
                                     <tbody>
-<?php $sql = "SELECT * from  tblauthors";
+<?php $sql = "SELECT * from  authors";
 $query = $dbh -> prepare($sql);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);

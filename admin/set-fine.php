@@ -12,14 +12,14 @@ if(isset($_POST['update']))
 {
 $fine=$_POST['finetf'];
 
-$sql ="SELECT fine from tblfine ";
+$sql ="SELECT fine from fine ";
 $query = $dbh -> prepare($sql);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
 $listedbooks=$query->rowCount();
 if($listedbooks==0)
 {
-$sql="insert into tblfine values(:fine)";
+$sql="insert into fine values(:fine)";
 $query = $dbh->prepare($sql);
 $query->bindParam(':fine',$fine,PDO::PARAM_STR);
 $query->execute();
@@ -27,7 +27,7 @@ $lastInsertId = $dbh->lastInsertId();
 }
 else
 {	
-$sql="update tblfine set fine=:fine where 1";
+$sql="update fine set fine=:fine where 1";
 $query = $dbh->prepare($sql);
 $query->bindParam(':fine',$fine,PDO::PARAM_STR);
 $query->execute();

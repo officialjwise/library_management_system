@@ -1,6 +1,6 @@
 <?php
 include('includes/config.php');
-$ret="select * from tblfine where 1";
+$ret="select * from fine where 1";
 $query= $dbh -> prepare($ret);
 $query-> execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);

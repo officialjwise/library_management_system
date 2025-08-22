@@ -12,7 +12,7 @@ if(isset($_POST['update']))
 {
 $athrid=intval($_GET['athrid']);
 $author=$_POST['author'];
-$sql="update  tblauthors set AuthorName=:author where id=:athrid";
+$sql="update  authors set AuthorName=:author where id=:athrid";
 $query = $dbh->prepare($sql);
 $query->bindParam(':author',$author,PDO::PARAM_STR);
 $query->bindParam(':athrid',$athrid,PDO::PARAM_STR);
@@ -68,7 +68,7 @@ Publication Info
 <label>Publication Name</label>
 <?php 
 $athrid=intval($_GET['athrid']);
-$sql = "SELECT * from  tblauthors where id=:athrid";
+$sql = "SELECT * from  authors where id=:athrid";
 $query = $dbh -> prepare($sql);
 $query->bindParam(':athrid',$athrid,PDO::PARAM_STR);
 $query->execute();

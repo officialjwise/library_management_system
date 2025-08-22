@@ -16,14 +16,14 @@ $fine=$_POST['fine'];
 $ISBNNumber=$_GET['ISBNNumber'];
 
 $rstatus=1;
-$sql="update tblissuedbookdetails set fine=:fine,ReturnStatus=:rstatus where id=:rid";
+$sql="update issuedbookdetails set fine=:fine,ReturnStatus=:rstatus where id=:rid";
 $query = $dbh->prepare($sql);
 $query->bindParam(':rid',$rid,PDO::PARAM_STR);
 $query->bindParam(':fine',$fine,PDO::PARAM_STR);
 $query->bindParam(':rstatus',$rstatus,PDO::PARAM_STR);
 $query->execute();
 
-$sql="update tblbooks set IssuedCopies=IssuedCopies-1 where ISBNNumber=:ISBNNumber";
+$sql="update books set IssuedCopies=IssuedCopies-1 where ISBNNumber=:ISBNNumber";
 $query = $dbh->prepare($sql);
 $query->bindParam(':ISBNNumber',$ISBNNumber,PDO::PARAM_STR);
 $query->execute();
@@ -116,7 +116,7 @@ Issued Book Details
 <form role="form" method="post">
 <?php 
 $rid=intval($_GET['rid']);
-$sql = "SELECT tblstudents.FullName,tblbooks.BookName,tblbooks.id,tblbooks.ISBNNumber,tblissuedbookdetails.IssuesDate,tblissuedbookdetails.ReturnDate,tblissuedbookdetails.id as rid,tblissuedbookdetails.fine,tblissuedbookdetails.ReturnStatus from  tblissuedbookdetails join tblstudents on tblstudents.StudentId=tblissuedbookdetails.StudentId join tblbooks on tblbooks.id=tblissuedbookdetails.BookId where tblissuedbookdetails.id=:rid";
+$sql = "SELECT students.FullName,books.BookName,books.id,books.ISBNNumber,issuedbookdetails.IssuesDate,issuedbookdetails.ReturnDate,issuedbookdetails.id as rid,issuedbookdetails.fine,issuedbookdetails.ReturnStatus from  issuedbookdetails join students on students.StudentId=issuedbookdetails.StudentId join books on books.id=issuedbookdetails.BookId where issuedbookdetails.id=:rid";
 $query = $dbh -> prepare($sql);
 $query->bindParam(':rid',$rid,PDO::PARAM_STR);
 $query->execute();

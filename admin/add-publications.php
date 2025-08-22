@@ -11,7 +11,7 @@ else{
 if(isset($_POST['create']))
 {
 $author=$_POST['author'];
-$sql="INSERT INTO  tblauthors(AuthorName) VALUES(:author)";
+$sql="INSERT INTO  authors(AuthorName) VALUES(:author)";
 $query = $dbh->prepare($sql);
 $query->bindParam(':author',$author,PDO::PARAM_STR);
 $query->execute();

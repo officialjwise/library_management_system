@@ -12,7 +12,7 @@ if(isset($_POST['create']))
 {
 $category=$_POST['category'];
 $status=$_POST['status'];
-  $sql = "SELECT * from tblcategory where CategoryName=:CategoryName";
+  $sql = "SELECT * from category where CategoryName=:CategoryName";
   $query = $dbh -> prepare($sql);
   $query->bindParam(':CategoryName',$category,PDO::PARAM_STR);
   $query->execute();
@@ -25,7 +25,7 @@ $status=$_POST['status'];
   }
   else
   {
-    $sql="INSERT INTO  tblcategory(CategoryName,Status) VALUES(:category,:status)";
+    $sql="INSERT INTO  category(CategoryName,Status) VALUES(:category,:status)";
 	$query = $dbh->prepare($sql);
 	$query->bindParam(':category',$category,PDO::PARAM_STR);
 	$query->bindParam(':status',$status,PDO::PARAM_STR);

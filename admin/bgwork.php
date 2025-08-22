@@ -4,7 +4,7 @@ if($_SESSION['thread1']==0)
 include('includes/config.php');
 $date=Date('Y/m/d');
 
-$ret="select * from tblfine where 1";
+$ret="select * from fine where 1";
 $query= $dbh -> prepare($ret);
 $query-> execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -16,7 +16,7 @@ $_SESSION['fine']=$result->fine;
 }
 }
 
-$ret="select BookId,StudentID,IssuesDate from tblissuedbookdetails where ReturnStatus=0";
+$ret="select BookId,StudentID,IssuesDate from issuedbookdetails where ReturnStatus=0";
 $query= $dbh -> prepare($ret);
 $query-> execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -41,7 +41,7 @@ $days=floor($diff/86400);
 			$query2 = $dbh->prepare($sql);
 			
 			
-			$sq="select FullName,MobileNumber from tblstudents where StudentId=:studentid";
+			$sq="select FullName,MobileNumber from students where StudentId=:studentid";
 			$query4 = $dbh->prepare($sq);
 			$query4->bindParam(':studentid',$result->StudentID,PDO::PARAM_STR);
 			$query4->execute();
