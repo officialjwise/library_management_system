@@ -1,6 +1,7 @@
 <?php
 session_start();
-error_reporting(0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 include('includes/config.php');
 if(strlen($_SESSION['alogin'])==0)
     {   
@@ -10,33 +11,78 @@ else{
 
 if(isset($_POST['add']))
 {
-$bookname=$_POST['bookname'];
-$category=$_POST['category'];
-$author=$_POST['author'];
-$isbn=$_POST['isbn'];
-$price=$_POST['price'];
-$copies=$_POST['copies'];
-$sql="INSERT INTO  books(BookName,CatId,AuthorId,ISBNNumber,BookPrice,Copies) VALUES(:bookname,:category,:author,:isbn,:price,:copies)";
-$query = $dbh->prepare($sql);
-$query->bindParam(':bookname',$bookname,PDO::PARAM_STR);
-$query->bindParam(':category',$category,PDO::PARAM_STR);
-$query->bindParam(':author',$author,PDO::PARAM_STR);
-$query->bindParam(':isbn',$isbn,PDO::PARAM_STR);
-$query->bindParam(':price',$price,PDO::PARAM_STR);
-$query->bindParam(':copies',$copies,PDO::PARAM_STR);
-$query->execute();
-$lastInsertId = $dbh->lastInsertId();
-if($lastInsertId)
-{
-$_SESSION['msg']="Book Listed successfully";
-header('location:manage-books.php');
-}
-else 
-{
-$_SESSION['error']="Something went wrong. Please try again";
-header('location:manage-books.php');
-}
-
+    // Validate and sanitize input data
+    $bookname = trim($_POST['bookname']);
+    $category = intval($_POST['category']);
+    $author = intval($_POST['author']);
+    $isbn = trim($_POST['isbn']);
+    $price = floatval($_POST['price']);
+    $copies = intval($_POST['copies']);
+    
+    // Validation
+    $errors = array();
+    
+    if(empty($bookname)) {
+        $errors[] = "Book name is required";
+    }
+    
+    if($category <= 0) {
+        $errors[] = "Please select a valid category";
+    }
+    
+    if($author <= 0) {
+        $errors[] = "Please select a valid author/publication";
+    }
+    
+    if(empty($isbn)) {
+        $errors[] = "ISBN number is required";
+    }
+    
+    if($price <= 0) {
+        $errors[] = "Price must be greater than 0";
+    }
+    
+    if($copies <= 0) {
+        $errors[] = "Number of copies must be greater than 0";
+    }
+    
+    // Check if ISBN already exists
+    if(!empty($isbn)) {
+        $check_sql = "SELECT id FROM books WHERE ISBNNumber = :isbn";
+        $check_query = $dbh->prepare($check_sql);
+        $check_query->bindParam(':isbn', $isbn, PDO::PARAM_STR);
+        $check_query->execute();
+        if($check_query->rowCount() > 0) {
+            $errors[] = "ISBN number already exists. Please use a unique ISBN.";
+        }
+    }
+    
+    if(empty($errors)) {
+        try {
+            $sql = "INSERT INTO books(BookName,CatId,AuthorId,ISBNNumber,BookPrice,Copies,IssuedCopies) VALUES(:bookname,:category,:author,:isbn,:price,:copies,0)";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':bookname', $bookname, PDO::PARAM_STR);
+            $query->bindParam(':category', $category, PDO::PARAM_INT);
+            $query->bindParam(':author', $author, PDO::PARAM_INT);
+            $query->bindParam(':isbn', $isbn, PDO::PARAM_STR);
+            $query->bindParam(':price', $price, PDO::PARAM_STR);
+            $query->bindParam(':copies', $copies, PDO::PARAM_INT);
+            
+            if($query->execute()) {
+                $lastInsertId = $dbh->lastInsertId();
+                $_SESSION['msg'] = "Book '" . htmlentities($bookname) . "' added successfully with ISBN: " . htmlentities($isbn);
+                header('location:manage-books.php');
+                exit();
+            } else {
+                $errorInfo = $query->errorInfo();
+                $_SESSION['error'] = "Database error: " . $errorInfo[2];
+            }
+        } catch(PDOException $e) {
+            $_SESSION['error'] = "Error adding book: " . $e->getMessage();
+        }
+    } else {
+        $_SESSION['error'] = implode("<br>", $errors);
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -68,7 +114,23 @@ header('location:manage-books.php');
             <div class="col-md-12">
                 <h4 class="header-line">Add Book</h4>
                 
-                            </div>
+                <!-- Display Success Message -->
+                <?php if(isset($_SESSION['msg'])) { ?>
+                <div class="alert alert-success">
+                    <?php echo htmlentities($_SESSION['msg']); ?>
+                    <?php unset($_SESSION['msg']); ?>
+                </div>
+                <?php } ?>
+                
+                <!-- Display Error Message -->
+                <?php if(isset($_SESSION['error'])) { ?>
+                <div class="alert alert-danger">
+                    <?php echo $_SESSION['error']; ?>
+                    <?php unset($_SESSION['error']); ?>
+                </div>
+                <?php } ?>
+                
+            </div>
 
 </div>
 <div class="row">
@@ -134,12 +196,12 @@ foreach($results as $result)
  
  <div class="form-group">
  <label>No of Copies<span style="color:red;">*</span></label>
- <input class="form-control" type="text" name="copies" autocomplete="off"   required="required" />
+ <input class="form-control" type="number" name="copies" min="1" autocomplete="off" required="required" />
  </div>
  
  <div class="form-group">
  <label>Price in GH₵<span style="color:red;">*</span></label>
- <input class="form-control" type="text" name="price" placeholder="Enter price in Ghana Cedis" autocomplete="off" required="required" />
+ <input class="form-control" type="number" step="0.01" min="0.01" name="price" placeholder="Enter price in Ghana Cedis" autocomplete="off" required="required" />
  </div>
 <button type="submit" name="add" class="btn btn-info">Add </button>
 

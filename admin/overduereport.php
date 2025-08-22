@@ -15,7 +15,7 @@ require_once 'includes/config.php';
 			<th>Student Name</th>
 			<th>Student ID</th>
 			<th>Phone Number</th>
-			<th>Fine</th>
+			<th>Fine (GH₵)</th>
 		</tr>
 
 		<tr>';
@@ -31,7 +31,7 @@ require_once 'includes/config.php';
 				<td><center>'.$result->StudentName.'</center></td>
 				<td><center>'.$result->StudentID.'</center></td>
 				<td><center>'.$result->MobNumber.'</center></td>
-				<td><center>'.$result->Fine.'</center></td>
+				<td><center>GH₵'.number_format($result->Fine, 2).'</center></td>
 			</tr>';	
 			$cnt+=1;
 			$totalcredit+=$result->Fine;
@@ -40,7 +40,7 @@ require_once 'includes/config.php';
 		$table .= '
 		</tr>		
 	</table>
-	<div align="right">Total Credit:'.$totalcredit.'</div>
+	<div align="right">Total Fine: GH₵'.number_format($totalcredit, 2).'</div>
 	<br>
 	<button onClick="window.print()">Print this page</button>
 	';	

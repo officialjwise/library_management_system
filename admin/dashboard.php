@@ -167,7 +167,7 @@ $fine=$result->fine;
 }
 ?>
 
-                            <h3><?php echo htmlentities($fine);?> </h3>
+                            <h3>GH₵<?php echo number_format($fine, 2);?></h3>
                            Current Fine Per Day
                         </div>
                     </div>     

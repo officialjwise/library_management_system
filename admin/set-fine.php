@@ -88,8 +88,8 @@ Fine Update Section
 <div class="panel-body">
 <form role="form" method="post">
 <div class="form-group">
-<label>Fine Per Day</label>
-<input class="form-control" type="text" name="finetf" autocomplete="off"  required />
+<label>Fine Per Day (in GH₵)</label>
+<input class="form-control" type="number" step="0.01" min="0" name="finetf" placeholder="Enter fine amount in Ghana Cedis" autocomplete="off" required />
 </div>
 
 <button type="submit" name="update" class="btn btn-info">Update </button>

@@ -173,7 +173,7 @@ if(strpos($status,'exceeded')!== false && $result->ReturnDate===NULL)
 {
 $flag=1;
 	?>
-<span><b>Fine To Be Paid:</b><?php echo htmlentities($days*$_SESSION['fine']);?></span>
+<span><b>Fine To Be Paid:</b> GH₵<?php echo number_format($days*$_SESSION['fine'], 2);?></span>
 <?php
 }?>
 </div>
@@ -181,20 +181,20 @@ $flag=1;
 
 <?php if($flag===1){?>
 <div class="form-group">
-<label>Fine (in Rs) :</label>
+<label>Fine (in GH₵) :</label>
 <input class="form-control" type="text" name="fine" id="fine" />
 <?php }
 else {
 ?>
 <div class="form-group">
-<label>Fine (in Rs) :</label>
+<label>Fine (in GH₵) :</label>
 <?php
 if($result->fine===Null){
-echo htmlentities("0");
+echo "GH₵0.00";
 }
 else
 {
-	echo htmlentities($result->fine);
+	echo "GH₵" . number_format($result->fine, 2);
 }
 }
 ?></div>

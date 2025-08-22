@@ -1,6 +1,7 @@
 <?php
 session_start();
-error_reporting(0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 include('includes/config.php');
 if(strlen($_SESSION['alogin'])==0)
     {   
@@ -10,27 +11,84 @@ else{
 
 if(isset($_POST['update']))
 {
-$bookname=$_POST['bookname'];
-$category=$_POST['category'];
-$author=$_POST['author'];
-$isbn=$_POST['isbn'];
-$price=$_POST['price'];
-$bookid=intval($_GET['bookid']);
-$Copies=($_GET['Copies']);
-$sql="update books set BookName=:bookname,CatId=:category,AuthorId=:author,ISBNNumber=:isbn,BookPrice=:price,Copies=:Copies where id=:bookid";
-$query = $dbh->prepare($sql);
-$query->bindParam(':bookname',$bookname,PDO::PARAM_STR);
-$query->bindParam(':category',$category,PDO::PARAM_STR);
-$query->bindParam(':author',$author,PDO::PARAM_STR);
-$query->bindParam(':isbn',$isbn,PDO::PARAM_STR);
-$query->bindParam(':price',$price,PDO::PARAM_STR);
-$query->bindParam(':bookid',$bookid,PDO::PARAM_STR);
-$query->bindParam(':Copies',$Copies,PDO::PARAM_STR);
-$query->execute();
-$_SESSION['msg']="Book info updated successfully";
-header('location:manage-books.php');
-
-
+    // Validate and sanitize input data
+    $bookname = trim($_POST['bookname']);
+    $category = intval($_POST['category']);
+    $author = intval($_POST['author']);
+    $isbn = trim($_POST['isbn']);
+    $price = floatval($_POST['price']);
+    $copies = intval($_POST['copies']);
+    $bookid = intval($_GET['bookid']);
+    
+    // Validation
+    $errors = array();
+    
+    if(empty($bookname)) {
+        $errors[] = "Book name is required";
+    }
+    
+    if($category <= 0) {
+        $errors[] = "Please select a valid category";
+    }
+    
+    if($author <= 0) {
+        $errors[] = "Please select a valid author/publication";
+    }
+    
+    if(empty($isbn)) {
+        $errors[] = "ISBN number is required";
+    }
+    
+    if($price <= 0) {
+        $errors[] = "Price must be greater than 0";
+    }
+    
+    if($copies <= 0) {
+        $errors[] = "Number of copies must be greater than 0";
+    }
+    
+    if($bookid <= 0) {
+        $errors[] = "Invalid book ID";
+    }
+    
+    // Check if ISBN already exists (excluding current book)
+    if(!empty($isbn) && $bookid > 0) {
+        $check_sql = "SELECT id FROM books WHERE ISBNNumber = :isbn AND id != :bookid";
+        $check_query = $dbh->prepare($check_sql);
+        $check_query->bindParam(':isbn', $isbn, PDO::PARAM_STR);
+        $check_query->bindParam(':bookid', $bookid, PDO::PARAM_INT);
+        $check_query->execute();
+        if($check_query->rowCount() > 0) {
+            $errors[] = "ISBN number already exists for another book. Please use a unique ISBN.";
+        }
+    }
+    
+    if(empty($errors)) {
+        try {
+            $sql = "UPDATE books SET BookName=:bookname,CatId=:category,AuthorId=:author,ISBNNumber=:isbn,BookPrice=:price,Copies=:copies WHERE id=:bookid";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':bookname', $bookname, PDO::PARAM_STR);
+            $query->bindParam(':category', $category, PDO::PARAM_INT);
+            $query->bindParam(':author', $author, PDO::PARAM_INT);
+            $query->bindParam(':isbn', $isbn, PDO::PARAM_STR);
+            $query->bindParam(':price', $price, PDO::PARAM_STR);
+            $query->bindParam(':copies', $copies, PDO::PARAM_INT);
+            $query->bindParam(':bookid', $bookid, PDO::PARAM_INT);
+            
+            if($query->execute()) {
+                $_SESSION['msg'] = "Book '" . htmlentities($bookname) . "' updated successfully";
+                header('location:manage-books.php');
+                exit();
+            } else {
+                $errorInfo = $query->errorInfo();
+                $_SESSION['error'] = "Database error: " . $errorInfo[2];
+            }
+        } catch(PDOException $e) {
+            $_SESSION['error'] = "Error updating book: " . $e->getMessage();
+        }
+    } else {
+        $_SESSION['error'] = implode("<br>", $errors);
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -60,9 +118,25 @@ header('location:manage-books.php');
          <div class="container">
         <div class="row pad-botm">
             <div class="col-md-12">
-                <h4 class="header-line">Add Book</h4>
+                <h4 class="header-line">Edit Book</h4>
                 
-                            </div>
+                <!-- Display Success Message -->
+                <?php if(isset($_SESSION['msg'])) { ?>
+                <div class="alert alert-success">
+                    <?php echo htmlentities($_SESSION['msg']); ?>
+                    <?php unset($_SESSION['msg']); ?>
+                </div>
+                <?php } ?>
+                
+                <!-- Display Error Message -->
+                <?php if(isset($_SESSION['error'])) { ?>
+                <div class="alert alert-danger">
+                    <?php echo $_SESSION['error']; ?>
+                    <?php unset($_SESSION['error']); ?>
+                </div>
+                <?php } ?>
+                
+            </div>
 
 </div>
 <div class="row">
@@ -156,12 +230,12 @@ continue;
  
   <div class="form-group">
  <label>No of Copies<span style="color:red;">*</span></label>
- <input class="form-control" type="text" name="copies" value="<?php echo htmlentities($result->Copies);?>"   required="required" />
+ <input class="form-control" type="number" min="1" name="copies" value="<?php echo htmlentities($result->Copies);?>" required="required" />
  </div>
   
  <div class="form-group">
  <label>Price in GH₵<span style="color:red;">*</span></label>
- <input class="form-control" type="text" name="price" value="<?php echo htmlentities($result->BookPrice);?>" placeholder="Enter price in Ghana Cedis" required="required" />
+ <input class="form-control" type="number" step="0.01" min="0.01" name="price" value="<?php echo htmlentities($result->BookPrice);?>" placeholder="Enter price in Ghana Cedis" required="required" />
  </div>
  <?php }} ?>
 <button type="submit" name="update" class="btn btn-info">Update </button>
