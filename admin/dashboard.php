@@ -49,7 +49,7 @@ else{?>
                       <div class="alert alert-success back-widget-set text-center">
                             <i class="fa fa-book fa-5x"></i>
 <?php 
-$sql ="SELECT id from tblbooks ";
+$sql ="SELECT id from books ";
 $query = $dbh -> prepare($sql);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -67,7 +67,7 @@ $listdbooks=$query->rowCount();
                       <div class="alert alert-info back-widget-set text-center">
                             <i class="fa fa-bars fa-5x"></i>
 <?php 
-$sql1 ="SELECT id from tblissuedbookdetails ";
+$sql1 ="SELECT id from issuedbookdetails ";
 $query1 = $dbh -> prepare($sql1);
 $query1->execute();
 $results1=$query1->fetchAll(PDO::FETCH_OBJ);
@@ -84,7 +84,7 @@ $issuedbooks=$query1->rowCount();
                             <i class="fa fa-recycle fa-5x"></i>
 <?php 
 $status=1;
-$sql2 ="SELECT id from tblissuedbookdetails where ReturnStatus=:status";
+$sql2 ="SELECT id from issuedbookdetails where ReturnStatus=:status";
 $query2 = $dbh -> prepare($sql2);
 $query2->bindParam(':status',$status,PDO::PARAM_STR);
 $query2->execute();
@@ -100,7 +100,7 @@ $returnedbooks=$query2->rowCount();
                       <div class="alert alert-danger back-widget-set text-center">
                             <i class="fa fa-users fa-5x"></i>
                             <?php 
-$sql3 ="SELECT id from tblstudents ";
+$sql3 ="SELECT id from students ";
 $query3 = $dbh -> prepare($sql3);
 $query3->execute();
 $results3=$query3->fetchAll(PDO::FETCH_OBJ);
@@ -121,7 +121,7 @@ $regstds=$query3->rowCount();
                       <div class="alert alert-success back-widget-set text-center">
                             <i class="fa fa-user fa-5x"></i>
 <?php 
-$sql4 ="SELECT id from tblauthors ";
+$sql4 ="SELECT id from authors ";
 $query4 = $dbh -> prepare($sql4);
 $query4->execute();
 $results4=$query4->fetchAll(PDO::FETCH_OBJ);
@@ -139,7 +139,7 @@ $listdathrs=$query4->rowCount();
                       <div class="alert alert-info back-widget-set text-center">
                             <i class="fa fa-file-archive-o fa-5x"></i>
 <?php 
-$sql5 ="SELECT id from tblcategory ";
+$sql5 ="SELECT id from category ";
 $query5 = $dbh -> prepare($sql5);
 $query5->execute();
 $results5=$query5->fetchAll(PDO::FETCH_OBJ);
@@ -154,7 +154,7 @@ $listdcats=$query5->rowCount();
                       <div class="alert alert-info back-widget-set text-center">
                             <i class="fa fa-money fa-5x"></i>
 <?php 
-$ret="select * from tblfine where 1";
+$ret="select * from fine where 1";
 $query= $dbh -> prepare($ret);
 $query-> execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);

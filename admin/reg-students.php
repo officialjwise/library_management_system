@@ -13,7 +13,7 @@ if(isset($_GET['inid']))
 {
 $id=$_GET['inid'];
 $status=0;
-$sql = "update tblstudents set Status=:status  WHERE id=:id";
+$sql = "update students set Status=:status  WHERE id=:id";
 $query = $dbh->prepare($sql);
 $query -> bindParam(':id',$id, PDO::PARAM_STR);
 $query -> bindParam(':status',$status, PDO::PARAM_STR);
@@ -28,7 +28,7 @@ if(isset($_GET['id']))
 {
 $id=$_GET['id'];
 $status=1;
-$sql = "update tblstudents set Status=:status  WHERE id=:id";
+$sql = "update students set Status=:status  WHERE id=:id";
 $query = $dbh->prepare($sql);
 $query -> bindParam(':id',$id, PDO::PARAM_STR);
 $query -> bindParam(':status',$status, PDO::PARAM_STR);
@@ -85,7 +85,10 @@ header('location:reg-students.php');
                                         <tr>
                                             <th>#</th>
                                             <th>Student ID</th>
+                                            <th>Index Number</th>
                                             <th>Student Name</th>
+                                            <th>College</th>
+                                            <th>Department</th>
                                             <th>Email id </th>
                                             <th>Mobile Number</th>
                                             <th>Reg Date</th>
@@ -94,7 +97,7 @@ header('location:reg-students.php');
                                         </tr>
                                     </thead>
                                     <tbody>
-<?php $sql = "SELECT * from tblstudents";
+<?php $sql = "SELECT * from students";
 $query = $dbh -> prepare($sql);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -106,7 +109,10 @@ foreach($results as $result)
                                         <tr class="odd gradeX">
                                             <td class="center"><?php echo htmlentities($cnt);?></td>
                                             <td class="center"><?php echo htmlentities($result->StudentId);?></td>
+                                            <td class="center"><?php echo htmlentities($result->IndexNumber);?></td>
                                             <td class="center"><?php echo htmlentities($result->FullName);?></td>
+                                            <td class="center"><?php echo htmlentities($result->College);?></td>
+                                            <td class="center"><?php echo htmlentities($result->Department);?></td>
                                             <td class="center"><?php echo htmlentities($result->EmailId);?></td>
                                             <td class="center"><?php echo htmlentities($result->MobileNumber);?></td>
                                              <td class="center"><?php echo htmlentities($result->RegDate);?></td>
