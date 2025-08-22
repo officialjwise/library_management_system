@@ -17,7 +17,7 @@ $isbn=$_POST['isbn'];
 $price=$_POST['price'];
 $bookid=intval($_GET['bookid']);
 $Copies=($_GET['Copies']);
-$sql="update tblbooks set BookName=:bookname,CatId=:category,AuthorId=:author,ISBNNumber=:isbn,BookPrice=:price,Copies=:Copies where id=:bookid";
+$sql="update books set BookName=:bookname,CatId=:category,AuthorId=:author,ISBNNumber=:isbn,BookPrice=:price,Copies=:Copies where id=:bookid";
 $query = $dbh->prepare($sql);
 $query->bindParam(':bookname',$bookname,PDO::PARAM_STR);
 $query->bindParam(':category',$category,PDO::PARAM_STR);
@@ -75,7 +75,7 @@ Book Info
 <form role="form" method="post">
 <?php 
 $bookid=intval($_GET['bookid']);
-$sql = "SELECT tblbooks.BookName,tblcategory.CategoryName,tblbooks.Copies,tblcategory.id as cid,tblauthors.AuthorName,tblauthors.id as athrid,tblbooks.ISBNNumber,tblbooks.BookPrice,tblbooks.id as bookid from  tblbooks join tblcategory on tblcategory.id=tblbooks.CatId join tblauthors on tblauthors.id=tblbooks.AuthorId where tblbooks.id=:bookid";
+$sql = "SELECT books.BookName,category.CategoryName,books.Copies,category.id as cid,authors.AuthorName,authors.id as athrid,books.ISBNNumber,books.BookPrice,books.id as bookid from  books join category on category.id=books.CatId join authors on authors.id=books.AuthorId where books.id=:bookid";
 $query = $dbh -> prepare($sql);
 $query->bindParam(':bookid',$bookid,PDO::PARAM_STR);
 $query->execute();
@@ -101,7 +101,7 @@ foreach($results as $result)
 <option value="<?php echo htmlentities($result->cid);?>"> <?php echo htmlentities($catname=$result->CategoryName);?></option>
 <?php 
 $status=1;
-$sql1 = "SELECT * from  tblcategory where Status=:status";
+$sql1 = "SELECT * from  category where Status=:status";
 $query1 = $dbh -> prepare($sql1);
 $query1-> bindParam(':status',$status, PDO::PARAM_STR);
 $query1->execute();
@@ -129,7 +129,7 @@ else
 <option value="<?php echo htmlentities($result->athrid);?>"> <?php echo htmlentities($athrname=$result->AuthorName);?></option>
 <?php 
 
-$sql2 = "SELECT * from  tblauthors ";
+$sql2 = "SELECT * from  authors ";
 $query2 = $dbh -> prepare($sql2);
 $query2->execute();
 $result2=$query2->fetchAll(PDO::FETCH_OBJ);
@@ -160,8 +160,8 @@ continue;
  </div>
   
  <div class="form-group">
- <label>Price in Rs<span style="color:red;">*</span></label>
- <input class="form-control" type="text" name="price" value="<?php echo htmlentities($result->BookPrice);?>"   required="required" />
+ <label>Price in GH₵<span style="color:red;">*</span></label>
+ <input class="form-control" type="text" name="price" value="<?php echo htmlentities($result->BookPrice);?>" placeholder="Enter price in Ghana Cedis" required="required" />
  </div>
  <?php }} ?>
 <button type="submit" name="update" class="btn btn-info">Update </button>

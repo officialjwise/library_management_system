@@ -16,7 +16,7 @@ $author=$_POST['author'];
 $isbn=$_POST['isbn'];
 $price=$_POST['price'];
 $copies=$_POST['copies'];
-$sql="INSERT INTO  tblbooks(BookName,CatId,AuthorId,ISBNNumber,BookPrice,Copies) VALUES(:bookname,:category,:author,:isbn,:price,:copies)";
+$sql="INSERT INTO  books(BookName,CatId,AuthorId,ISBNNumber,BookPrice,Copies) VALUES(:bookname,:category,:author,:isbn,:price,:copies)";
 $query = $dbh->prepare($sql);
 $query->bindParam(':bookname',$bookname,PDO::PARAM_STR);
 $query->bindParam(':category',$category,PDO::PARAM_STR);
@@ -90,7 +90,7 @@ Book Info
 <option value=""> Select Category</option>
 <?php 
 $status=1;
-$sql = "SELECT * from  tblcategory where Status=:status";
+$sql = "SELECT * from  category where Status=:status";
 $query = $dbh -> prepare($sql);
 $query -> bindParam(':status',$status, PDO::PARAM_STR);
 $query->execute();
@@ -112,7 +112,7 @@ foreach($results as $result)
 <option value=""> Select Publication</option>
 <?php 
 
-$sql = "SELECT * from  tblauthors ";
+$sql = "SELECT * from  authors ";
 $query = $dbh -> prepare($sql);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -138,8 +138,8 @@ foreach($results as $result)
  </div>
  
  <div class="form-group">
- <label>Price<span style="color:red;">*</span></label>
- <input class="form-control" type="text" name="price" autocomplete="off"   required="required" />
+ <label>Price in GH₵<span style="color:red;">*</span></label>
+ <input class="form-control" type="text" name="price" placeholder="Enter price in Ghana Cedis" autocomplete="off" required="required" />
  </div>
 <button type="submit" name="add" class="btn btn-info">Add </button>
 
