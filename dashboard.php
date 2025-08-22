@@ -49,7 +49,7 @@ else{?>
                             <i class="fa fa-bars fa-5x"></i>
 <?php 
 $sid=$_SESSION['stdid'];
-$sql1 ="SELECT id from tblissuedbookdetails where StudentID=:sid";
+$sql1 ="SELECT id from issuedbookdetails where StudentID=:sid";
 $query1 = $dbh -> prepare($sql1);
 $query1->bindParam(':sid',$sid,PDO::PARAM_STR);
 $query1->execute();
@@ -67,7 +67,7 @@ $issuedbooks=$query1->rowCount();
                             <i class="fa fa-recycle fa-5x"></i>
 <?php 
 $rsts=0;
-$sql2 ="SELECT id from tblissuedbookdetails where StudentID=:sid and ReturnStatus=:rsts";
+$sql2 ="SELECT id from issuedbookdetails where StudentID=:sid and ReturnStatus=:rsts";
 $query2 = $dbh -> prepare($sql2);
 $query2->bindParam(':sid',$sid,PDO::PARAM_STR);
 $query2->bindParam(':rsts',$rsts,PDO::PARAM_STR);

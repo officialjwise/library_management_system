@@ -4,23 +4,55 @@ include('includes/config.php');
 error_reporting(0);
 if(isset($_POST['signup']))
 {
-//Code for student ID
-$count_my_page = ("studentid.txt");
-$hits = file($count_my_page);
-$hits[0] ++;
-$fp = fopen($count_my_page , "w");
-fputs($fp , "$hits[0]");
-fclose($fp); 
-$StudentId= $hits[0];   
+$studentid=$_POST['studentid'];
+$indexnumber=$_POST['indexnumber'];
 $fname=$_POST['fullanme'];
+$college=$_POST['college'];
+$department=$_POST['department'];
 $mobileno=$_POST['mobileno'];
 $email=$_POST['email']; 
 $password=md5($_POST['password']); 
 $status=1;
-$sql="INSERT INTO  tblstudents(StudentId,FullName,MobileNumber,EmailId,Password,Status) VALUES(:StudentId,:fname,:mobileno,:email,:password,:status)";
+
+// Validate Student ID (8 digits)
+if(!preg_match('/^\d{8}$/', $studentid)) {
+    echo "<script>alert('Student ID must be exactly 8 digits');</script>";
+    exit;
+}
+
+// Validate Index Number (7 digits)
+if(!preg_match('/^\d{7}$/', $indexnumber)) {
+    echo "<script>alert('Index Number must be exactly 7 digits');</script>";
+    exit;
+}
+
+// Check if Student ID already exists
+$checkstudent="SELECT StudentId FROM students WHERE StudentId=:studentid";
+$querychk = $dbh -> prepare($checkstudent);
+$querychk->bindParam(':studentid',$studentid,PDO::PARAM_STR);
+$querychk->execute();
+if($querychk->rowCount() > 0)
+{
+echo "<script>alert('Student ID already exists. Please use a different Student ID');</script>";
+}
+// Check if Index Number already exists
+else {
+$checkindex="SELECT IndexNumber FROM students WHERE IndexNumber=:indexnumber";
+$querychkindex = $dbh -> prepare($checkindex);
+$querychkindex->bindParam(':indexnumber',$indexnumber,PDO::PARAM_STR);
+$querychkindex->execute();
+if($querychkindex->rowCount() > 0)
+{
+echo "<script>alert('Index Number already exists. Please use a different Index Number');</script>";
+}
+else {
+$sql="INSERT INTO students(StudentId,IndexNumber,FullName,College,Department,MobileNumber,EmailId,Password,Status) VALUES(:studentid,:indexnumber,:fname,:college,:department,:mobileno,:email,:password,:status)";
 $query = $dbh->prepare($sql);
-$query->bindParam(':StudentId',$StudentId,PDO::PARAM_STR);
+$query->bindParam(':studentid',$studentid,PDO::PARAM_STR);
+$query->bindParam(':indexnumber',$indexnumber,PDO::PARAM_STR);
 $query->bindParam(':fname',$fname,PDO::PARAM_STR);
+$query->bindParam(':college',$college,PDO::PARAM_STR);
+$query->bindParam(':department',$department,PDO::PARAM_STR);
 $query->bindParam(':mobileno',$mobileno,PDO::PARAM_STR);
 $query->bindParam(':email',$email,PDO::PARAM_STR);
 $query->bindParam(':password',$password,PDO::PARAM_STR);
@@ -29,11 +61,13 @@ $query->execute();
 $lastInsertId = $dbh->lastInsertId();
 if($lastInsertId)
 {
-echo '<script>alert("Your Registration successfull and your student id is  "+"'.$StudentId.'")</script>';
+echo '<script>alert("Registration successful! Student ID: '.$studentid.' | Index Number: '.$indexnumber.'")</script>';
 }
 else 
 {
 echo "<script>alert('Something went wrong. Please try again');</script>";
+}
+}
 }
 }
 ?>
@@ -60,6 +94,23 @@ echo "<script>alert('Something went wrong. Please try again');</script>";
 <script type="text/javascript">
 function valid()
 {
+// Validate Student ID (8 digits)
+var studentid = document.signup.studentid.value;
+if(!/^\d{8}$/.test(studentid)) {
+    alert("Student ID must be exactly 8 digits!");
+    document.signup.studentid.focus();
+    return false;
+}
+
+// Validate Index Number (7 digits)
+var indexnumber = document.signup.indexnumber.value;
+if(!/^\d{7}$/.test(indexnumber)) {
+    alert("Index Number must be exactly 7 digits!");
+    document.signup.indexnumber.focus();
+    return false;
+}
+
+// Validate password confirmation
 if(document.signup.password.value!= document.signup.confirmpassword.value)
 {
 alert("Password and Confirm Password Field do not match  !!");
@@ -82,6 +133,26 @@ $("#loaderIcon").hide();
 },
 error:function (){}
 });
+}
+
+function loadDepartments() {
+var college = $("#college").val();
+if(college != "") {
+    $("#department").html('<option value="">Loading...</option>');
+    $.ajax({
+        url: "get_departments.php",
+        type: "POST",
+        data: {college: college},
+        success: function(data) {
+            $("#department").html(data);
+        },
+        error: function() {
+            $("#department").html('<option value="">Error loading departments</option>');
+        }
+    });
+} else {
+    $("#department").html('<option value="">Select College First</option>');
+}
 }
 </script>    
 
@@ -108,9 +179,46 @@ error:function (){}
                         </div>
                         <div class="panel-body">
                             <form name="signup" method="post" onSubmit="return valid();">
+
+<div class="form-group">
+<label>Student ID (8 digits) <span style="color:red;">*</span></label>
+<input class="form-control" type="text" name="studentid" maxlength="8" pattern="\d{8}" title="Please enter exactly 8 digits" placeholder="e.g., 20857953" autocomplete="off" required />
+<small class="text-muted">Enter your 8-digit KNUST Student ID</small>
+</div>
+
+<div class="form-group">
+<label>Index Number (7 digits) <span style="color:red;">*</span></label>
+<input class="form-control" type="text" name="indexnumber" maxlength="7" pattern="\d{7}" title="Please enter exactly 7 digits" placeholder="e.g., 8552721" autocomplete="off" required />
+<small class="text-muted">Enter your 7-digit Index Number</small>
+</div>
+
 <div class="form-group">
 <label>Enter Full Name</label>
 <input class="form-control" type="text" name="fullanme" autocomplete="off" required />
+</div>
+
+<div class="form-group">
+<label>Select College <span style="color:red;">*</span></label>
+<select class="form-control" name="college" id="college" required onchange="loadDepartments()">
+<option value="">Select College</option>
+<?php 
+$sql = "SELECT id, CollegeName FROM colleges WHERE Status=1 ORDER BY CollegeName";
+$query = $dbh->prepare($sql);
+$query->execute();
+$results = $query->fetchAll(PDO::FETCH_OBJ);
+if($query->rowCount() > 0) {
+    foreach($results as $result) { ?>
+        <option value="<?php echo htmlentities($result->CollegeName);?>"><?php echo htmlentities($result->CollegeName);?></option>
+    <?php }
+} ?>
+</select>
+</div>
+
+<div class="form-group">
+<label>Select Department <span style="color:red;">*</span></label>
+<select class="form-control" name="department" id="department" required>
+<option value="">Select College First</option>
+</select>
 </div>
 
 

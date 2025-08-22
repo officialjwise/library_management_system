@@ -13,7 +13,7 @@ $sid=$_SESSION['stdid'];
 $fname=$_POST['fullanme'];
 $mobileno=$_POST['mobileno'];
 
-$sql="update tblstudents set FullName=:fname,MobileNumber=:mobileno where StudentId=:sid";
+$sql="update students set FullName=:fname,MobileNumber=:mobileno where StudentId=:sid";
 $query = $dbh->prepare($sql);
 $query->bindParam(':sid',$sid,PDO::PARAM_STR);
 $query->bindParam(':fname',$fname,PDO::PARAM_STR);
@@ -70,7 +70,7 @@ echo '<script>alert("Your profile has been updated")</script>';
                             <form name="signup" method="post">
 <?php 
 $sid=$_SESSION['stdid'];
-$sql="SELECT StudentId,FullName,EmailId,MobileNumber,RegDate,UpdationDate,Status from  tblstudents  where StudentId=:sid ";
+$sql="SELECT StudentId,IndexNumber,FullName,College,Department,EmailId,MobileNumber,RegDate,UpdationDate,Status from  students  where StudentId=:sid ";
 $query = $dbh -> prepare($sql);
 $query-> bindParam(':sid', $sid, PDO::PARAM_STR);
 $query->execute();
@@ -84,6 +84,21 @@ foreach($results as $result)
 <div class="form-group">
 <label>Student ID : </label>
 <?php echo htmlentities($result->StudentId);?>
+</div>
+
+<div class="form-group">
+<label>Index Number : </label>
+<?php echo htmlentities($result->IndexNumber);?>
+</div>
+
+<div class="form-group">
+<label>College : </label>
+<?php echo htmlentities($result->College);?>
+</div>
+
+<div class="form-group">
+<label>Department : </label>
+<?php echo htmlentities($result->Department);?>
 </div>
 
 <div class="form-group">
