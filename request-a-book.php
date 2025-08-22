@@ -1,6 +1,7 @@
 <?php
 session_start();
-error_reporting(0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 include('includes/config.php');
 if(strlen($_SESSION['login'])==0)
     {   
@@ -40,7 +41,7 @@ else{
                 <h4 class="header-line">Request a Book</h4>
     </div>
      <div class="row">
-    <?php if($_SESSION['error']!="")
+    <?php if(isset($_SESSION['error']) && $_SESSION['error']!="")
     {?>
 <div class="col-md-6">
 <div class="alert alert-danger" >
@@ -50,7 +51,7 @@ else{
 </div>
 </div>
 <?php } ?>
-<?php if($_SESSION['msg']!="")
+<?php if(isset($_SESSION['msg']) && $_SESSION['msg']!="")
 {?>
 <div class="col-md-6">
 <div class="alert alert-success" >
@@ -63,7 +64,7 @@ else{
 
 
 
-   <?php if($_SESSION['delmsg']!="")
+   <?php if(isset($_SESSION['delmsg']) && $_SESSION['delmsg']!="")
     {?>
 <div class="col-md-6">
 <div class="alert alert-success" >
@@ -93,12 +94,12 @@ else{
 											<th>Category</th>
 											<th>Publication Name</th>
                                             <th>ISBN </th>
-                                            <th>Price</th>
+                                            <th>Price (GH₵)</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-<?php $sql = "SELECT tblbooks.BookName,tblbooks.Copies,tblbooks.IssuedCopies,tblcategory.CategoryName,tblauthors.AuthorName,tblbooks.ISBNNumber,tblbooks.BookPrice,tblbooks.id as bookid from  tblbooks join tblcategory on tblcategory.id=tblbooks.CatId join tblauthors on tblauthors.id=tblbooks.AuthorId";
+<?php $sql = "SELECT books.BookName,books.Copies,books.IssuedCopies,category.CategoryName,authors.AuthorName,books.ISBNNumber,books.BookPrice,books.id as bookid from  books join category on category.id=books.CatId join authors on authors.id=books.AuthorId";
 $query = $dbh -> prepare($sql);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -116,9 +117,36 @@ if($result->Copies > $result->IssuedCopies)
                                             <td class="center"><?php echo htmlentities($result->CategoryName);?></td>
                                             <td class="center"><?php echo htmlentities($result->AuthorName);?></td>
                                             <td class="center"><?php echo htmlentities($result->ISBNNumber);?></td>
-                                            <td class="center"><?php echo htmlentities($result->BookPrice);?></td>
-											<td class="center"><a href="temp.php?ISBNNumber=<?php echo $result->ISBNNumber;?>&BookName=<?php echo $result->BookName;?>&AuthorName=<?php echo $result->AuthorName;?>&CategoryName=<?php echo $result->CategoryName;?>&BookPrice=<?php echo $result->BookPrice;?>&StudName=<?php echo $_SESSION['username'];?>&StudentID=<?php echo $_SESSION['stdid'];?>
-											"><button class="btn btn-primary" name="submit" id="submit" type="submit"><i class="fa fa-edit "></i> Request</button></td>		
+                                            <td class="center">GH₵<?php echo number_format($result->BookPrice, 2);?></td>
+											<td class="center">
+											<?php
+											$requestUrl = "temp.php?" . http_build_query([
+											    'ISBNNumber' => $result->ISBNNumber,
+											    'BookName' => $result->BookName,
+											    'AuthorName' => $result->AuthorName,
+											    'CategoryName' => $result->CategoryName,
+											    'BookPrice' => $result->BookPrice,
+											    'StudName' => $_SESSION['username'] ?? 'Unknown',
+											    'StudentID' => $_SESSION['stdid'] ?? ''
+											]);
+											?>
+											<a href="<?php echo $requestUrl; ?>">
+											    <button class="btn btn-primary" name="submit" id="submit" type="submit">
+											        <i class="fa fa-edit "></i> Request
+											    </button>
+											</a>
+											
+											<!-- Debug link -->
+											<br><small><a href="debug-request.php?<?php echo http_build_query([
+											    'ISBNNumber' => $result->ISBNNumber,
+											    'BookName' => $result->BookName,
+											    'AuthorName' => $result->AuthorName,
+											    'CategoryName' => $result->CategoryName,
+											    'BookPrice' => $result->BookPrice,
+											    'StudName' => $_SESSION['username'] ?? 'Unknown',
+											    'StudentID' => $_SESSION['stdid'] ?? ''
+											]); ?>" target="_blank">Debug</a></small>
+											</td>		
                                         </tr>
 <?php $cnt=$cnt+1;}}} ?>                                      
                                     </tbody>
